@@ -1,0 +1,18 @@
+type Query {
+  locale(zip: String!): Location!
+  nearbyLocations: [Location!]!
+}
+
+type Location {
+  name: String!
+  region: String!
+  current: Current!
+}
+
+type Current {
+  temperature: Int!
+  feelslike: Int!
+  windSpeed: Int!
+  windDirection: String!
+  isDay: Boolean!
+}
