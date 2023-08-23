@@ -60,7 +60,7 @@ func GetWeather(target interface{}, zip string) error {
 
 	defer resp.Body.Close()
 
-	final := json.NewDecoder(resp.Body).Decode(target)
+	t := json.NewDecoder(resp.Body).Decode(target)
 
-	return final
+	return t
 }
