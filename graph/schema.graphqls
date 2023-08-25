@@ -1,18 +1,40 @@
 type Query {
-  locale(zip: String!): Location!
-  nearbyLocations: [Location!]!
+  currentWeather(lat: String!, lon: String!): CurrentWeather!
 }
 
-type Location {
-  name: String!
-  region: String!
-  current: Current!
+type CurrentWeather {
+  weather: [Weather!]!
+  atmosphere: Atmosphere!
+  conditions: Conditions!
 }
 
-type Current {
-  temperature: Int!
-  feelslike: Int!
-  windSpeed: Int!
-  windDirection: String!
-  isDay: Boolean!
+type Weather {
+  id: Int!
+  type: String!
+  description: String!
+}
+
+type Atmosphere {
+  temperature: Temperature!
+  pressure: Int
+  humidity: Int
+}
+
+type Temperature {
+  real: Float!
+  min: Float!
+  max: Float!
+  feelslike: Float!
+}
+
+type Wind {
+  speed: Float!
+  degree: Int!
+  gust: Float!
+}
+
+type Conditions {
+  wind: Wind!
+  sunrise: Int!
+  sunset: Int!
 }

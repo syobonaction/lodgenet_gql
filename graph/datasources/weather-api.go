@@ -8,50 +8,64 @@ import (
 
 var client http.Client
 
-type Request struct {
-	Type     string
-	Query    string
-	Language string
-	Unit     string
+type Coordinates struct {
+	Lat float64
+	Lon float64
 }
 
-type Location struct {
+type Weather struct {
+	Id          int
+	Main        string
+	Description string
+	Icon        string
+}
+
+type Main struct {
+	Temp       float64
+	Feels_like float64
+	Temp_min   float64
+	Temp_max   float64
+	Pressure   int
+	Humidity   int
+}
+
+type Wind struct {
+	Speed float64
+	Deg   int
+	Gust  float64
+}
+
+type Clouds struct {
+	All int
+}
+
+type Sys struct {
+	Type    int
+	Id      int
+	Country string
+	Sunrise int
+	Sunset  int
+}
+
+type CurrentWeather struct {
+	Coordinates Coordinates
+	Weather     []*Weather
+	Base        string
+	Main        Main
+	Visibility  int
+	Wind        Wind
+	Clouds      Clouds
+	Dt          int
+	Sys         Sys
+	Timezone    int
+	Id          int
 	Name        string
-	Country     string
-	Region      string
-	Lat         string
-	Lon         string
-	Timezone_id string
+	Cod         interface{}
 }
 
-type Current struct {
-	Observation_time     string
-	Temperature          int
-	Weather_code         int
-	Weather_icons        []string
-	Weather_descriptions []string
-	Wind_speed           int
-	Wind_degree          int
-	Wind_dir             string
-	Pressure             int
-	Precip               int
-	Humidity             int
-	Cloudcover           int
-	Feelslike            int
-	Uv_index             int
-	Visibility           int
-	Is_day               string
-}
-
-type WeatherData struct {
-	Request  Request
-	Location Location
-	Current  Current
-}
-
-func GetWeather(target interface{}, zip string) error {
+func GetCurrentWeather(target interface{}, lat string, lon string) error {
 	api_key := os.Getenv("API_KEY")
-	url := "http://api.weatherstack.com/current?access_key=" + api_key + "&query=" + zip + ""
+	url := "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + api_key + ""
 	resp, err := client.Get(url)
 
 	if err != nil {
@@ -63,4 +77,5 @@ func GetWeather(target interface{}, zip string) error {
 	t := json.NewDecoder(resp.Body).Decode(target)
 
 	return t
+
 }

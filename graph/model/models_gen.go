@@ -2,16 +2,39 @@
 
 package model
 
-type Current struct {
-	Temperature   int    `json:"temperature"`
-	Feelslike     int    `json:"feelslike"`
-	WindSpeed     int    `json:"windSpeed"`
-	WindDirection string `json:"windDirection"`
-	IsDay         bool   `json:"isDay"`
+type Atmosphere struct {
+	Temperature *Temperature `json:"temperature"`
+	Pressure    *int         `json:"pressure,omitempty"`
+	Humidity    *int         `json:"humidity,omitempty"`
 }
 
-type Location struct {
-	Name    string   `json:"name"`
-	Region  string   `json:"region"`
-	Current *Current `json:"current"`
+type Conditions struct {
+	Wind    *Wind `json:"wind"`
+	Sunrise int   `json:"sunrise"`
+	Sunset  int   `json:"sunset"`
+}
+
+type CurrentWeather struct {
+	Weather    []*Weather  `json:"weather"`
+	Atmosphere *Atmosphere `json:"atmosphere"`
+	Conditions *Conditions `json:"conditions"`
+}
+
+type Temperature struct {
+	Real      float64 `json:"real"`
+	Min       float64 `json:"min"`
+	Max       float64 `json:"max"`
+	Feelslike float64 `json:"feelslike"`
+}
+
+type Weather struct {
+	ID          int    `json:"id"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+}
+
+type Wind struct {
+	Speed  float64 `json:"speed"`
+	Degree int     `json:"degree"`
+	Gust   float64 `json:"gust"`
 }
