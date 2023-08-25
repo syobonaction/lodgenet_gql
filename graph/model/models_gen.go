@@ -31,6 +31,7 @@ type Weather struct {
 	ID          int    `json:"id"`
 	Type        string `json:"type"`
 	Description string `json:"description"`
+	Icon        string `json:"icon"`
 }
 
 type Wind struct {

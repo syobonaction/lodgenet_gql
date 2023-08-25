@@ -12,6 +12,7 @@ type Weather {
   id: Int!
   type: String!
   description: String!
+  icon: String!
 }
 
 type Atmosphere {
