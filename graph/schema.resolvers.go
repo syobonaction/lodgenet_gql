@@ -3,6 +3,8 @@ package graph
 import (
 	"context"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"netreality.world/m/graph/datasources"
 	"netreality.world/m/graph/model"
 )
@@ -16,12 +18,13 @@ func (r *queryResolver) CurrentWeather(ctx context.Context, lat string, lon stri
 		return nil, err
 	} else {
 		w := []*model.Weather{}
+		caser := cases.Title(language.AmericanEnglish)
 
 		for _, s := range d.Weather {
 			e := &model.Weather{
 				ID:          s.Id,
 				Type:        s.Main,
-				Description: s.Description,
+				Description: caser.String(s.Description),
 			}
 
 			w = append(w, e)
