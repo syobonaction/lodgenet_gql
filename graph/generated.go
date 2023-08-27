@@ -62,8 +62,16 @@ type ComplexityRoot struct {
 		Weather    func(childComplexity int) int
 	}
 
+	Forecast struct {
+		Atmosphere func(childComplexity int) int
+		Conditions func(childComplexity int) int
+		Time       func(childComplexity int) int
+		Weather    func(childComplexity int) int
+	}
+
 	Query struct {
 		CurrentWeather func(childComplexity int, lat string, lon string) int
+		Forecast       func(childComplexity int, lat string, lon string) int
 	}
 
 	Temperature struct {
@@ -71,6 +79,11 @@ type ComplexityRoot struct {
 		Max       func(childComplexity int) int
 		Min       func(childComplexity int) int
 		Real      func(childComplexity int) int
+	}
+
+	Time struct {
+		AsInt    func(childComplexity int) int
+		AsString func(childComplexity int) int
 	}
 
 	Weather struct {
@@ -89,6 +102,7 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	CurrentWeather(ctx context.Context, lat string, lon string) (*model.CurrentWeather, error)
+	Forecast(ctx context.Context, lat string, lon string) ([]*model.Forecast, error)
 }
 
 type executableSchema struct {
@@ -169,6 +183,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CurrentWeather.Weather(childComplexity), true
 
+	case "Forecast.atmosphere":
+		if e.complexity.Forecast.Atmosphere == nil {
+			break
+		}
+
+		return e.complexity.Forecast.Atmosphere(childComplexity), true
+
+	case "Forecast.conditions":
+		if e.complexity.Forecast.Conditions == nil {
+			break
+		}
+
+		return e.complexity.Forecast.Conditions(childComplexity), true
+
+	case "Forecast.time":
+		if e.complexity.Forecast.Time == nil {
+			break
+		}
+
+		return e.complexity.Forecast.Time(childComplexity), true
+
+	case "Forecast.weather":
+		if e.complexity.Forecast.Weather == nil {
+			break
+		}
+
+		return e.complexity.Forecast.Weather(childComplexity), true
+
 	case "Query.currentWeather":
 		if e.complexity.Query.CurrentWeather == nil {
 			break
@@ -180,6 +222,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.CurrentWeather(childComplexity, args["lat"].(string), args["lon"].(string)), true
+
+	case "Query.forecast":
+		if e.complexity.Query.Forecast == nil {
+			break
+		}
+
+		args, err := ec.field_Query_forecast_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Forecast(childComplexity, args["lat"].(string), args["lon"].(string)), true
 
 	case "Temperature.feelslike":
 		if e.complexity.Temperature.Feelslike == nil {
@@ -208,6 +262,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Temperature.Real(childComplexity), true
+
+	case "Time.as_int":
+		if e.complexity.Time.AsInt == nil {
+			break
+		}
+
+		return e.complexity.Time.AsInt(childComplexity), true
+
+	case "Time.as_string":
+		if e.complexity.Time.AsString == nil {
+			break
+		}
+
+		return e.complexity.Time.AsString(childComplexity), true
 
 	case "Weather.description":
 		if e.complexity.Weather.Description == nil {
@@ -382,6 +450,30 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 }
 
 func (ec *executionContext) field_Query_currentWeather_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["lat"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lat"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["lat"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["lon"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lon"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["lon"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_forecast_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -877,6 +969,214 @@ func (ec *executionContext) fieldContext_CurrentWeather_conditions(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Forecast_time(ctx context.Context, field graphql.CollectedField, obj *model.Forecast) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Forecast_time(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Time)
+	fc.Result = res
+	return ec.marshalNTime2ᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Forecast_time(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Forecast",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "as_int":
+				return ec.fieldContext_Time_as_int(ctx, field)
+			case "as_string":
+				return ec.fieldContext_Time_as_string(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Time", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Forecast_weather(ctx context.Context, field graphql.CollectedField, obj *model.Forecast) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Forecast_weather(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Weather, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Weather)
+	fc.Result = res
+	return ec.marshalNWeather2ᚕᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐWeatherᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Forecast_weather(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Forecast",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Weather_id(ctx, field)
+			case "type":
+				return ec.fieldContext_Weather_type(ctx, field)
+			case "description":
+				return ec.fieldContext_Weather_description(ctx, field)
+			case "icon":
+				return ec.fieldContext_Weather_icon(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Weather", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Forecast_atmosphere(ctx context.Context, field graphql.CollectedField, obj *model.Forecast) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Forecast_atmosphere(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Atmosphere, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Atmosphere)
+	fc.Result = res
+	return ec.marshalNAtmosphere2ᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐAtmosphere(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Forecast_atmosphere(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Forecast",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "temperature":
+				return ec.fieldContext_Atmosphere_temperature(ctx, field)
+			case "pressure":
+				return ec.fieldContext_Atmosphere_pressure(ctx, field)
+			case "humidity":
+				return ec.fieldContext_Atmosphere_humidity(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Atmosphere", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Forecast_conditions(ctx context.Context, field graphql.CollectedField, obj *model.Forecast) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Forecast_conditions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Conditions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Conditions)
+	fc.Result = res
+	return ec.marshalNConditions2ᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐConditions(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Forecast_conditions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Forecast",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "wind":
+				return ec.fieldContext_Conditions_wind(ctx, field)
+			case "sunrise":
+				return ec.fieldContext_Conditions_sunrise(ctx, field)
+			case "sunset":
+				return ec.fieldContext_Conditions_sunset(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Conditions", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_currentWeather(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_currentWeather(ctx, field)
 	if err != nil {
@@ -934,6 +1234,71 @@ func (ec *executionContext) fieldContext_Query_currentWeather(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_currentWeather_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_forecast(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_forecast(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Forecast(rctx, fc.Args["lat"].(string), fc.Args["lon"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Forecast)
+	fc.Result = res
+	return ec.marshalNForecast2ᚕᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐForecastᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_forecast(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "time":
+				return ec.fieldContext_Forecast_time(ctx, field)
+			case "weather":
+				return ec.fieldContext_Forecast_weather(ctx, field)
+			case "atmosphere":
+				return ec.fieldContext_Forecast_atmosphere(ctx, field)
+			case "conditions":
+				return ec.fieldContext_Forecast_conditions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Forecast", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_forecast_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1240,6 +1605,94 @@ func (ec *executionContext) fieldContext_Temperature_feelslike(ctx context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Time_as_int(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_as_int(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AsInt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Time_as_int(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Time",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Time_as_string(ctx context.Context, field graphql.CollectedField, obj *model.Time) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Time_as_string(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AsString, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Time_as_string(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Time",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3475,6 +3928,60 @@ func (ec *executionContext) _CurrentWeather(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var forecastImplementors = []string{"Forecast"}
+
+func (ec *executionContext) _Forecast(ctx context.Context, sel ast.SelectionSet, obj *model.Forecast) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, forecastImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Forecast")
+		case "time":
+			out.Values[i] = ec._Forecast_time(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "weather":
+			out.Values[i] = ec._Forecast_weather(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "atmosphere":
+			out.Values[i] = ec._Forecast_atmosphere(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "conditions":
+			out.Values[i] = ec._Forecast_conditions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3504,6 +4011,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_currentWeather(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "forecast":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_forecast(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3575,6 +4104,50 @@ func (ec *executionContext) _Temperature(ctx context.Context, sel ast.SelectionS
 			}
 		case "feelslike":
 			out.Values[i] = ec._Temperature_feelslike(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var timeImplementors = []string{"Time"}
+
+func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, obj *model.Time) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, timeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Time")
+		case "as_int":
+			out.Values[i] = ec._Time_as_int(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "as_string":
+			out.Values[i] = ec._Time_as_string(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4094,6 +4667,60 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
+func (ec *executionContext) marshalNForecast2ᚕᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐForecastᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Forecast) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNForecast2ᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐForecast(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNForecast2ᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐForecast(ctx context.Context, sel ast.SelectionSet, v *model.Forecast) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Forecast(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4132,6 +4759,16 @@ func (ec *executionContext) marshalNTemperature2ᚖnetrealityᚗworldᚋmᚋgrap
 		return graphql.Null
 	}
 	return ec._Temperature(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTime2ᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐTime(ctx context.Context, sel ast.SelectionSet, v *model.Time) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Time(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNWeather2ᚕᚖnetrealityᚗworldᚋmᚋgraphᚋmodelᚐWeatherᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Weather) graphql.Marshaler {

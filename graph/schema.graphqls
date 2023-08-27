@@ -1,11 +1,24 @@
 type Query {
   currentWeather(lat: String!, lon: String!): CurrentWeather!
+  forecast(lat: String!, lon: String!): [Forecast!]!
 }
 
 type CurrentWeather {
   weather: [Weather!]!
   atmosphere: Atmosphere!
   conditions: Conditions!
+}
+
+type Forecast {
+  time: Time!
+  weather: [Weather!]!
+  atmosphere: Atmosphere!
+  conditions: Conditions!
+}
+
+type Time {
+  as_int: Int!
+  as_string: String!
 }
 
 type Weather {

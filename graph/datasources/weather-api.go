@@ -47,6 +47,33 @@ type Sys struct {
 	Sunset  int
 }
 
+type Rain struct {
+	H3 float64
+}
+
+type List struct {
+	Dt         int
+	Main       Main
+	Weather    []*Weather
+	Clouds     Clouds
+	Wind       Wind
+	Visibility int
+	Pop        float64
+	Rain       Rain
+	Dt_txt     string
+}
+
+type City struct {
+	Id          int
+	Name        string
+	Coordinates Coordinates
+	Country     string
+	Population  int
+	Timezone    int
+	Sunrise     int
+	Sunset      int
+}
+
 type CurrentWeather struct {
 	Coordinates Coordinates
 	Weather     []*Weather
@@ -63,6 +90,14 @@ type CurrentWeather struct {
 	Cod         interface{}
 }
 
+type Forecast struct {
+	Cod     string
+	Message int
+	Cnt     int
+	List    []*List
+	City    City
+}
+
 func GetCurrentWeather(target interface{}, lat string, lon string) error {
 	api_key := os.Getenv("API_KEY")
 	url := "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + api_key + ""
@@ -77,5 +112,20 @@ func GetCurrentWeather(target interface{}, lat string, lon string) error {
 	t := json.NewDecoder(resp.Body).Decode(target)
 
 	return t
+}
 
+func GetForecast(target interface{}, lat string, lon string) error {
+	api_key := os.Getenv("API_KEY")
+	url := "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + api_key + ""
+	resp, err := client.Get(url)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	t := json.NewDecoder(resp.Body).Decode(target)
+
+	return t
 }

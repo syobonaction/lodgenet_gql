@@ -20,11 +20,23 @@ type CurrentWeather struct {
 	Conditions *Conditions `json:"conditions"`
 }
 
+type Forecast struct {
+	Time       *Time       `json:"time"`
+	Weather    []*Weather  `json:"weather"`
+	Atmosphere *Atmosphere `json:"atmosphere"`
+	Conditions *Conditions `json:"conditions"`
+}
+
 type Temperature struct {
 	Real      float64 `json:"real"`
 	Min       float64 `json:"min"`
 	Max       float64 `json:"max"`
 	Feelslike float64 `json:"feelslike"`
+}
+
+type Time struct {
+	AsInt    int    `json:"as_int"`
+	AsString string `json:"as_string"`
 }
 
 type Weather struct {

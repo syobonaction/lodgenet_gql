@@ -66,6 +66,63 @@ func (r *queryResolver) CurrentWeather(ctx context.Context, lat string, lon stri
 	}
 }
 
+// Forecast is the resolver for the forecast field.
+func (r *queryResolver) Forecast(ctx context.Context, lat string, lon string) ([]*model.Forecast, error) {
+	d := &datasources.Forecast{}
+	err := datasources.GetForecast(d, lat, lon)
+
+	if err != nil {
+		return nil, err
+	} else {
+		m := []*model.Forecast{}
+
+		for _, s := range d.List {
+			w := []*model.Weather{}
+			caser := cases.Title(language.AmericanEnglish)
+
+			for _, s := range s.Weather {
+				e := &model.Weather{
+					ID:          s.Id,
+					Type:        s.Main,
+					Description: caser.String(s.Description),
+					Icon:        s.Icon,
+				}
+
+				w = append(w, e)
+			}
+
+			v := &model.Forecast{
+				Time: &model.Time{
+					AsInt:    s.Dt,
+					AsString: s.Dt_txt,
+				},
+				Weather: w,
+				Atmosphere: &model.Atmosphere{
+					Temperature: &model.Temperature{
+						Real:      s.Main.Temp,
+						Min:       s.Main.Temp_min,
+						Max:       s.Main.Temp_max,
+						Feelslike: s.Main.Feels_like,
+					},
+					Pressure: &s.Main.Pressure,
+					Humidity: &s.Main.Humidity,
+				},
+				Conditions: &model.Conditions{
+					Wind: &model.Wind{
+						Speed:  s.Wind.Speed,
+						Degree: s.Wind.Deg,
+						Gust:   s.Wind.Gust,
+					},
+				},
+			}
+
+			m = append(m, v)
+		}
+
+		return m, nil
+	}
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
